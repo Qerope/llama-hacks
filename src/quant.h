@@ -11,3 +11,11 @@ struct block_q8_0 {
 
 void quantize_q8_0(const float *x, block_q8_0 *y, size_t n);
 void dequantize_q8_0(const block_q8_0 *x, float *y, size_t n);
+
+struct block_q4_0 {
+    float d;
+    uint8_t qs[QK / 2];
+};
+
+void quantize_q4_0(const float *x, block_q4_0 *y, size_t n);
+void dequantize_q4_0(const block_q4_0 *x, float *y, size_t n);
