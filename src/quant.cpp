@@ -13,8 +13,13 @@ uint16_t fp32_to_fp16(float f) {
     uint32_t mant = x & 0x7FFFFF;
     if (exp >= 31)
         return sign | 0x7C00;
-    if (exp <= 0)
-        return sign;
+    if (exp <= 0) {
+        // subnormal half: shift the mantissa (with the implicit bit) right
+        if (exp < -10)
+            return sign;
+        mant = (mant | 0x800000) >> (1 - exp);
+        return sign | (mant >> 13);
+    }
     return sign | (exp << 10) | (mant >> 13);
 }
 

@@ -27,6 +27,10 @@ int main() {
     dequantize_q4_0(q4.data(), y.data(), x.size());
     assert(rmse(x, y) < 0.2);
 
+    // scales this small are subnormal in fp16
+    float tiny = 3e-6f;
+    assert(std::fabs(fp16_to_fp32(fp32_to_fp16(tiny)) - tiny) < 1e-7f);
+
     printf("ok\n");
     return 0;
 }
