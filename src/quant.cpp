@@ -97,3 +97,32 @@ void dequantize_q4_0(const block_q4_0 *x, float *y, size_t n) {
         }
     }
 }
+
+void quantize_q4_1(const float *x, block_q4_1 *y, size_t n) {
+    for (size_t i = 0; i < n / QK; i++) {
+        float mn = x[i * QK], mx = x[i * QK];
+        for (int j = 1; j < QK; j++) {
+            mn = std::min(mn, x[i * QK + j]);
+            mx = std::max(mx, x[i * QK + j]);
+        }
+        float d = (mx - mn) / 15.0f;
+        float id = d ? 1.0f / d : 0.0f;
+        y[i].d = fp32_to_fp16(d);
+        y[i].m = fp32_to_fp16(mn);
+        for (int j = 0; j < QK / 2; j++) {
+            int a = std::min(15, (int)std::lround((x[i * QK + j] - mn) * id));
+            int b = std::min(15, (int)std::lround((x[i * QK + QK / 2 + j] - mn) * id));
+            y[i].qs[j] = a | (b << 4);
+        }
+    }
+}
+
+void dequantize_q4_1(const block_q4_1 *x, float *y, size_t n) {
+    for (size_t i = 0; i < n / QK; i++) {
+        float d = fp16_to_fp32(x[i].d), m = fp16_to_fp32(x[i].m);
+        for (int j = 0; j < QK / 2; j++) {
+            y[i * QK + j] = (x[i].qs[j] & 0xF) * d + m;
+            y[i * QK + QK / 2 + j] = (x[i].qs[j] >> 4) * d + m;
+        }
+    }
+}

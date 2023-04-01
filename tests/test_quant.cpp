@@ -31,6 +31,11 @@ int main() {
     float tiny = 3e-6f;
     assert(std::fabs(fp16_to_fp32(fp32_to_fp16(tiny)) - tiny) < 1e-7f);
 
+    std::vector<block_q4_1> q41(x.size() / QK);
+    quantize_q4_1(x.data(), q41.data(), x.size());
+    dequantize_q4_1(q41.data(), y.data(), x.size());
+    assert(rmse(x, y) < 0.15);
+
     printf("ok\n");
     return 0;
 }
