@@ -27,5 +27,6 @@ int main() {
     printf("q8_0  %.5f\n", measure<block_q8_0>(x, quantize_q8_0, dequantize_q8_0));
     printf("q4_0  %.5f\n", measure<block_q4_0>(x, quantize_q4_0, dequantize_q4_0));
     printf("q4_1  %.5f\n", measure<block_q4_1>(x, quantize_q4_1, dequantize_q4_1));
+    printf("q5_0  %.5f\n", measure<block_q5_0>(x, quantize_q5_0, dequantize_q5_0));
     return 0;
 }

@@ -31,3 +31,12 @@ struct block_q4_1 {
 
 void quantize_q4_1(const float *x, block_q4_1 *y, size_t n);
 void dequantize_q4_1(const block_q4_1 *x, float *y, size_t n);
+
+struct block_q5_0 {
+    uint16_t d;
+    uint8_t qh[4];
+    uint8_t qs[QK / 2];
+};
+
+void quantize_q5_0(const float *x, block_q5_0 *y, size_t n);
+void dequantize_q5_0(const block_q5_0 *x, float *y, size_t n);

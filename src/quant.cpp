@@ -126,3 +126,42 @@ void dequantize_q4_1(const block_q4_1 *x, float *y, size_t n) {
         }
     }
 }
+
+void quantize_q5_0(const float *x, block_q5_0 *y, size_t n) {
+    for (size_t i = 0; i < n / QK; i++) {
+        float amax = 0, max = 0;
+        for (int j = 0; j < QK; j++) {
+            float v = x[i * QK + j];
+            if (std::fabs(v) > amax) {
+                amax = std::fabs(v);
+                max = v;
+            }
+        }
+        float d = max / -16.0f;
+        float id = d ? 1.0f / d : 0.0f;
+        y[i].d = fp32_to_fp16(d);
+        uint32_t qh = 0;
+        for (int j = 0; j < QK / 2; j++) {
+            int a = std::min(31, (int)std::lround(x[i * QK + j] * id) + 16);
+            int b = std::min(31, (int)std::lround(x[i * QK + QK / 2 + j] * id) + 16);
+            y[i].qs[j] = (a & 0xF) | ((b & 0xF) << 4);
+            qh |= ((a >> 4) & 1u) << j;
+            qh |= ((b >> 4) & 1u) << (j + QK / 2);
+        }
+        memcpy(y[i].qh, &qh, sizeof qh);
+    }
+}
+
+void dequantize_q5_0(const block_q5_0 *x, float *y, size_t n) {
+    for (size_t i = 0; i < n / QK; i++) {
+        float d = fp16_to_fp32(x[i].d);
+        uint32_t qh;
+        memcpy(&qh, x[i].qh, sizeof qh);
+        for (int j = 0; j < QK / 2; j++) {
+            int a = (x[i].qs[j] & 0xF) | (((qh >> j) & 1) << 4);
+            int b = (x[i].qs[j] >> 4) | (((qh >> (j + QK / 2)) & 1) << 4);
+            y[i * QK + j] = (a - 16) * d;
+            y[i * QK + QK / 2 + j] = (b - 16) * d;
+        }
+    }
+}

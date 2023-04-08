@@ -36,6 +36,11 @@ int main() {
     dequantize_q4_1(q41.data(), y.data(), x.size());
     assert(rmse(x, y) < 0.15);
 
+    std::vector<block_q5_0> q5(x.size() / QK);
+    quantize_q5_0(x.data(), q5.data(), x.size());
+    dequantize_q5_0(q5.data(), y.data(), x.size());
+    assert(rmse(x, y) < 0.1);
+
     printf("ok\n");
     return 0;
 }
