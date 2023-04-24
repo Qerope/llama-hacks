@@ -27,6 +27,18 @@ int sample(std::vector<float> logits, const SamplerParams &p, std::mt19937 &rng
     for (auto &q : probs)
         q /= sum;
 
+    float cum = 0;
+    size_t keep = probs.size();
+    for (size_t i = 0; i < probs.size(); i++) {
+        cum += probs[i];
+        if (cum >= p.top_p) {
+            keep = i + 1;
+            break;
+        }
+    }
+    idx.resize(keep);
+    probs.resize(keep);
+
     std::discrete_distribution<int> d(probs.begin(), probs.end());
     return idx[d(rng)];
 }
