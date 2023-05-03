@@ -5,7 +5,13 @@
 #include <numeric>
 
 int sample(std::vector<float> logits, const SamplerParams &p, std::mt19937 &rng
+    , const std::vector<int> &last_tokens
 ) {
+    int n = std::min<int>(p.repeat_last_n, last_tokens.size());
+    for (int i = 0; i < n; i++) {
+        int t = last_tokens[last_tokens.size() - 1 - i];
+        logits[t] = logits[t] > 0 ? logits[t] / p.repeat_penalty : logits[t] * p.repeat_penalty;
+    }
     if (p.temperature <= 0) {
         return std::max_element(logits.begin(), logits.end()) - logits.begin();
     }
