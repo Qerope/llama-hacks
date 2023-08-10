@@ -5,6 +5,7 @@ BUILD = build
 all: $(BUILD)/test_quant
 all: $(BUILD)/quant_error
 all: $(BUILD)/test_sampler
+all: $(BUILD)/kv_estimate
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -17,6 +18,9 @@ $(BUILD)/quant_error: tools/quant_error.cpp src/quant.cpp | $(BUILD)
 
 $(BUILD)/test_sampler: tests/test_sampler.cpp src/sampler.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^
+
+$(BUILD)/kv_estimate: tools/kv_estimate.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test: all
 	$(BUILD)/test_quant
