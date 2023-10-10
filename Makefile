@@ -6,6 +6,7 @@ all: $(BUILD)/test_quant
 all: $(BUILD)/quant_error
 all: $(BUILD)/test_sampler
 all: $(BUILD)/kv_estimate
+all: $(BUILD)/gguf_info
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -20,6 +21,9 @@ $(BUILD)/test_sampler: tests/test_sampler.cpp src/sampler.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) -Isrc -o $@ $^
 
 $(BUILD)/kv_estimate: tools/kv_estimate.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(BUILD)/gguf_info: tools/gguf_info.cpp | $(BUILD)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 test: all
