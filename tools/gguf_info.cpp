@@ -23,6 +23,22 @@ static std::string rd_str() {
     return s;
 }
 
+static void skip_value(uint32_t type);
+
+static void skip_value(uint32_t type) {
+    static const int sizes[] = {1, 1, 2, 2, 4, 4, 4, 1, 0, 0, 8, 8, 8};
+    if (type == 8) {
+        rd_str();
+    } else if (type == 9) {
+        uint32_t et = rd<uint32_t>();
+        uint32_t n = rd<uint32_t>();
+        for (uint64_t i = 0; i < n; i++)
+            skip_value(et);
+    } else if (type < 13) {
+        fseek(f, sizes[type], SEEK_CUR);
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s file.gguf\n", argv[0]);
@@ -47,7 +63,7 @@ int main(int argc, char **argv) {
         std::string key = rd_str();
         uint32_t type = rd<uint32_t>();
         printf("  %s (type %u)\n", key.c_str(), type);
-        break;
+        skip_value(type);
     }
     return 0;
 }
