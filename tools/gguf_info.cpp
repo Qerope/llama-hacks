@@ -16,7 +16,7 @@ static T rd() {
 }
 
 static std::string rd_str() {
-    uint32_t n = rd<uint32_t>();
+    uint64_t n = rd<uint64_t>();
     std::string s(n, '\0');
     if (n && fread(&s[0], 1, n, f) != n)
         exit(1);
@@ -31,7 +31,7 @@ static void skip_value(uint32_t type) {
         rd_str();
     } else if (type == 9) {
         uint32_t et = rd<uint32_t>();
-        uint32_t n = rd<uint32_t>();
+        uint64_t n = rd<uint64_t>();
         for (uint64_t i = 0; i < n; i++)
             skip_value(et);
     } else if (type < 13) {
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
         return 1;
     }
     uint32_t version = rd<uint32_t>();
-    uint32_t n_tensors = rd<uint32_t>();
-    uint32_t n_kv = rd<uint32_t>();
+    uint64_t n_tensors = rd<uint64_t>();
+    uint64_t n_kv = rd<uint64_t>();
     printf("version %u, %llu tensors, %llu metadata keys\n", version,
            (unsigned long long)n_tensors, (unsigned long long)n_kv);
     for (uint64_t i = 0; i < n_kv; i++) {
