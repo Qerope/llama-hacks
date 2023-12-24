@@ -65,5 +65,16 @@ int main(int argc, char **argv) {
         printf("  %s (type %u)\n", key.c_str(), type);
         skip_value(type);
     }
+    static const char *type_names[] = {"f32", "f16", "q4_0", "q4_1", "q4_2", "q4_3", "q5_0", "q5_1", "q8_0"};
+    for (uint64_t i = 0; i < n_tensors; i++) {
+        std::string name = rd_str();
+        uint32_t ndim = rd<uint32_t>();
+        printf("%s [", name.c_str());
+        for (uint32_t d = 0; d < ndim; d++)
+            printf("%s%llu", d ? ", " : "", (unsigned long long)rd<uint64_t>());
+        uint32_t type = rd<uint32_t>();
+        rd<uint64_t>();  // offset
+        printf("] %s\n", type < 9 ? type_names[type] : "?");
+    }
     return 0;
 }
