@@ -45,6 +45,16 @@ int sample(std::vector<float> logits, const SamplerParams &p, std::mt19937 &rng
     idx.resize(keep);
     probs.resize(keep);
 
+    float min_p = p.min_p;
+    if (min_p > 0) {
+        float threshold = min_p * probs[0];
+        size_t k = 0;
+        while (k < probs.size() && probs[k] >= threshold)
+            k++;
+        idx.resize(k);
+        probs.resize(k);
+    }
+
     std::discrete_distribution<int> d(probs.begin(), probs.end());
     return idx[d(rng)];
 }
