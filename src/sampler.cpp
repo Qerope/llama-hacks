@@ -46,6 +46,7 @@ int sample(std::vector<float> logits, const SamplerParams &p, std::mt19937 &rng
     probs.resize(keep);
 
     float min_p = p.min_p;
+    min_p = std::min(1.0f, std::max(0.0f, min_p));
     if (min_p > 0) {
         float threshold = min_p * probs[0];
         size_t k = 0;
