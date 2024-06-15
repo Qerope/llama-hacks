@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include "sampler.h"
+#include "speculative.h"
 
 int main() {
     std::mt19937 rng(1);
@@ -36,6 +37,9 @@ int main() {
         int t = sample(logits, mp, rng);
         assert(t == 3 || t == 1);
     }
+
+    assert(accepted_prefix({1, 2, 3}, {1, 2, 9}) == 2);
+    assert(accepted_prefix({}, {1}) == 0);
 
     printf("ok\n");
     return 0;
